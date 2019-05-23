@@ -108,8 +108,7 @@ rankhospital("MN", "heart attack", 5000) # NA
 
 
 #Problem 4 Ranking hospitals in all states----
-
-rankall = function(outcome,num){
+rankall = function(outcome,num='best'){
     #Clean data ----
     data = read.csv("rprog_data_ProgAssignment3-data/outcome-of-care-measures.csv",colClasses = "character")
     #11 is heart attack 17 is heart failier 23 is Pneumonia
@@ -117,7 +116,69 @@ rankall = function(outcome,num){
     if(!(State %in% cdata[,2])) stop("invalid state")
     if(!(outcome %in% c("heart attack","heart failure","pneumonia"))) stop("wrong outcome")
     #Rank them ----
-    if (outcome == "heart attack"){
-        
+    St = sort(unique(cdata[,2]))
+    result = data.frame(character(),character())#create empty data frame
+    for( State in St){
+        data_state = cdata[which(cdata$State==State),]   #clean data with state
+        if (outcome == "heart attack"){
+            order_HA = data_state[order(data_state[,3],data_state[,1]),]#sort by heart attack and name
+            order_HA = order_HA[!is.na(order_HA[,3]),]
+            if(num <= nrow(order_HA) & is.numeric(num)){
+                result = rbind(result,order_HA[num,1:2])
+            }
+            else if(num =='best'){
+                result = rbind(result,order_HA[1,1:2])
+            }
+            else if (num == "worst"){
+                result = rbind(result,order_HA[nrow(order_HA),1:2])
+            }
+            else{
+                temp = data.frame(NA,State)
+                names(temp) = names(cdata[,1:2])
+                result = rbind(result,temp)
+                }
+        }
+        else if (outcome == 'heart failure'){
+            order_HF = data_state[order(data_state[,4],data_state[,1]),]#sort by heart faliuer and name
+            order_HF = order_HF[!is.na(order_HF[,4]),]
+            if(num <= nrow(order_HF) & is.numeric(num)){
+                result = rbind(result,order_HF[num,1:2])
+            }
+            else if(num =='best'){
+                result = rbind(result,order_HF[1,1:2])
+            }
+            else if (num == "worst"){
+                result = rbind(result,order_HF[nrow(order_HF),1:2])
+            }
+            else{                
+                temp = data.frame(NA,State)
+                names(temp) = names(cdata[,1:2])
+                result = rbind(result,temp)}
+        }
+        else{
+            order_P = data_state[order(data_state[,5],data_state[,1]),]#sort by heart faliuer and name
+            order_P = order_P[!is.na(order_P[,5]),]
+            if(num <= nrow(order_P) & is.numeric(num)){
+                result = rbind(result,order_HF[num,1:2])
+            }
+            else if(num =='best'){
+                result = rbind(result,order_P[1,1:2])
+            }
+            else if (num == "worst"){
+                result = rbind(result,order_P[nrow(order_P),1:2])
+            }
+            else{                
+                temp = data.frame(NA,State)
+                names(temp) = names(cdata[,1:2])
+                result = rbind(result,temp)}
+        }
     }
+    names(result) = c("hospital",'state')
+    rownames(result) = 1:nrow(result)
+    return(result)
 }
+#Test data
+head(rankall("heart attack", 20), 10)
+tail(rankall("pneumonia", "worst"), 3)
+tail(rankall("heart failure"), 10)
+
