@@ -89,7 +89,7 @@ rankhospital = function(State,outcome,num){
         # sort and create new DF by heart attack and name of hospital
         order_by_P = data_state[order(data_state[,5],data_state[,1]),]
         #remove the heart attack column's NA in column 5
-        P_data = order_by_P[!is.na(order_by_HF[,5]),]
+        P_data = order_by_P[!is.na(order_by_P[,5]),]
         
         if(is.numeric(num) & num <= nrow(data_state)) return(P_data[num,]$Hospital.Name)
         else if (num == 'best') return(P_data[,]$Hospital.Name)
@@ -113,7 +113,6 @@ rankall = function(outcome,num='best'){
     data = read.csv("rprog_data_ProgAssignment3-data/outcome-of-care-measures.csv",colClasses = "character")
     #11 is heart attack 17 is heart failier 23 is Pneumonia
     cdata = cbind(data[,c(2,7)],data.frame(lapply(data[,c(11,17,23)],as.numeric)))
-    if(!(State %in% cdata[,2])) stop("invalid state")
     if(!(outcome %in% c("heart attack","heart failure","pneumonia"))) stop("wrong outcome")
     #Rank them ----
     St = sort(unique(cdata[,2]))
